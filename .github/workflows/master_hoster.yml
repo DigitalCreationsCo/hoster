@@ -171,9 +171,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Verify App Service existence
-        run: |
-          az webapp show --name hoster --resource-group hoster
+      # - name: Verify App Service existence
+      #   run: |
+      #     az webapp show --name hoster --resource-group hoster
     
       - name: Unzip backend artifact
         run: unzip release.zip
