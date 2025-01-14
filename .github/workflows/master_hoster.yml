@@ -153,7 +153,11 @@ t
         run: |
           cd frontend
           npm install
-
+      
+      - name: Set frontend environment variables
+        run: |
+          echo "VITE_BACKEND_URL=" >> $GITHUB_ENV
+          
       - name: Build frontend
         run: |
           cd frontend
