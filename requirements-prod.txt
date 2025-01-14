@@ -1,4 +1,4 @@
--r requirements.txt
+-r backend/requirements.txt
 
 # Production-specific dependencies
 gunicorn==22.0.0
