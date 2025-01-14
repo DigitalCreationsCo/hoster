@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,32 +38,80 @@ jobs:
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
+          name: backend
           path: |
             release.zip
             !venv/
 
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload frontend bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: frontend/dist
+
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-backend, build-frontend]
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     
     steps:
-      - name: Download artifact from build job
+      - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
-          name: python-app
+          name: backend
 
-      - name: Unzip artifact for deployment
+      - name: Unzip backend artifact
         run: unzip release.zip
 
-      
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
+        id: deploy-backend
         with:
           app-name: 'hoster'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_337529ED7DC34EE2895AC04F10880895 }}
+
+      # Deploy frontend
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+
+      - name: Upload frontend to Azure Blob Storage
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+        run: |
+          az storage blob upload-batch \
+            --account-name $AZURE_STORAGE_ACCOUNT \
+            --account-key $AZURE_STORAGE_KEY \
+            --destination '$web' \
+            --source frontend/dist
+
+      - name: Verify deployment
+        run: |
+          echo "Backend URL: ${{ steps.deploy-backend.outputs.webapp-url }}"
+          echo "Frontend URL: https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net"
