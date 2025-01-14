@@ -33,9 +33,9 @@ def create_prod_env():
 
     env_vars["IS_PRODUCTION"] = config("IS_PRODUCTION", default="True")
 
-    env_vars["AZURE_CLIENT_ID"] = fetch_azure_value("AZURE_CLIENT_ID", ["az", "ad", "sp", "show", "--id", config("AZURE_CLIENT_ID")]) or config("AZURE_CLIENT_ID")
-    env_vars["AZURE_TENANT_ID"] = fetch_azure_value("AZURE_TENANT_ID", ["az", "account", "show", "--query", "tenantId"]) or config("AZURE_TENANT_ID")
-    env_vars["AZURE_SUBSCRIPTION_ID"] = fetch_azure_value("AZURE_SUBSCRIPTION_ID", ["az", "account", "show", "--query", "id"]) or config("AZURE_SUBSCRIPTION_ID")
+    env_vars["AZURE_CLIENT_ID"] = config("AZURE_CLIENT_ID")
+    env_vars["AZURE_TENANT_ID"] = config("AZURE_TENANT_ID")
+    env_vars["AZURE_SUBSCRIPTION_ID"] = config("AZURE_SUBSCRIPTION_ID")
     env_vars["AZURE_CREDENTIALS"] = config("AZURE_CREDENTIALS")
     
     env_vars["AZURE_LOCATION"] = fetch_azure_value("AZURE_LOCATION", ["az", "group", "list", "--query", "[0].location", "-o", "tsv"]) or config("AZURE_LOCATION", default="eastus")
