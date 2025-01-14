@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Production-specific dependencies
+gunicorn==22.0.0
+
+django-storages==1.14.2  # For cloud storage
+sentry-sdk==1.39.1  # Error tracking

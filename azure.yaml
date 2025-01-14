@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: azure-django-postgres-flexible-appservice
+metadata:
+    template: azure-django-postgres-flexible-appservice@0.0.1
+infra:
+    provider: "terraform"
+services:
+    backend:
+        type: webapp
+        name: hoster
+        location: eastasia
+        host: appservice
+        language: py
+        resources:
+        - app_service_plan: S1
+    frontend:
+        type: storage
+        name: hoster
+        location: eastasia
+        host: staticwebapp
+        language: ts
+    application_gateway:
+        type: applicationgateway
+        name: hoster-gateway
+        location: eastasia
+        host: appservice
+        resources:
+        - sku: Standard_v2
+        - capacity: 2

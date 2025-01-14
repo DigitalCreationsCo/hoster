@@ -1,0 +1,8 @@
+# django requirements
+django
+whitenoise
+azure-monitor-opentelemetry
+psycopg2
+ipython
+django-debug-toolbar
+azure-storage-blob
