@@ -18,26 +18,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Create and start virtual environmenname: Build and deploy Python app to Azure Web App - hoster
-
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
-
-jobs:
-  build-backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
       - name: Create and start virtual environment
         run: |
           python -m venv venv
@@ -46,7 +26,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements-prod.txt
-          pip install azure-cli  # Install Azure CLI if needed
+          pip install azure-cli
+          pip install azure-identity azure-keyvault-secrets
 
       # Authenticate with Azure using service principal
       - name: Log in to Azure
@@ -55,46 +36,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-
-      # Run the create-prod-env.py script to generate .env.production file
-      - name: Create production environment file
-        run: |
-          python create-prod-env.py
-
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Zip artifact for deployment
-        run: |
-          zip release.zip ./* -r \
-          -x venv/* \
-          -x .venv/* \
-          -x frontend/* \
-          -x infra/* \
-          -x node_modules/* \
-          -x .env \
-          -x .env.production \
-          -x .git/*
-
-      - name: Include additional deployment files
-        run: |
-          cp .env.production ./.env
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend
-          path: |
-            release.zip
-            .env
-t
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements-prod.txt
-          pip install azure-identity azure-keyvault-secrets  # Install Azure SDK for Key Vault
 
       - name: Fetch secrets from Azure Key Vault
         run: |
@@ -157,7 +98,7 @@ t
       - name: Set frontend environment variables
         run: |
           echo "VITE_BACKEND_URL=" >> $GITHUB_ENV
-          
+
       - name: Build frontend
         run: |
           cd frontend
