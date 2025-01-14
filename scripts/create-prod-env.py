@@ -42,11 +42,11 @@ def create_prod_env():
     env_vars["AZURE_STORAGE_ACCOUNT_NAME"] = fetch_azure_value("AZURE_STORAGE_ACCOUNT_NAME", ["az", "storage", "account", "list", "--query", "[0].name", "-o", "tsv"]) or config("AZURE_STORAGE_ACCOUNT_NAME", default="tfstate00002")
     env_vars["AZURE_STORAGE_CONNECTION_STRING"] = fetch_azure_value("AZURE_STORAGE_CONNECTION_STRING", ["az", "storage", "account", "show-connection-string", "--name", "tfstate00002", "--resource-group", "hoster", "--query", "connectionString"]) or config("AZURE_STORAGE_CONNECTION_STRING")
 
-    env_vars["AZURE_CONTAINER_NAME"] = fetch_azure_value("AZURE_CONTAINER_NAME") or config("AZURE_CONTAINER_NAME", default="projects")
+    env_vars["AZURE_CONTAINER_NAME"] = config("AZURE_CONTAINER_NAME", default="projects")
     env_vars["AZURE_STORAGE_ACCOUNT_KEY"] = fetch_azure_value("AZURE_STORAGE_ACCOUNT_KEY", ["az", "storage", "account", "keys", "list", "--account-name", "tfstate00002", "--resource-group", "hoster", "--query", "[0].value"]) or config("AZURE_STORAGE_ACCOUNT_KEY")
 
-    env_vars["AZURE_APP_SERVICE_NAME"] = fetch_azure_value("AZURE_APP_SERVICE_NAME") or config("AZURE_APP_SERVICE_NAME", default="hoster")
-    env_vars["AZURE_RESOURCE_GROUP"] = fetch_azure_value("AZURE_RESOURCE_GROUP") or config("AZURE_RESOURCE_GROUP", default="hoster")
+    env_vars["AZURE_APP_SERVICE_NAME"] = config("AZURE_APP_SERVICE_NAME", default="hoster")
+    env_vars["AZURE_RESOURCE_GROUP"] = config("AZURE_RESOURCE_GROUP", default="hoster")
     env_vars["STORAGE_BACKEND"] = config("STORAGE_BACKEND", default="azure")
 
     env_vars["DEBUG"] = "False"
