@@ -37,14 +37,16 @@ jobs:
           zip release.zip ./* -r \
           -x venv/* \
           -x .venv/* \
+          -x frontend/* \
+          -x infra/* \
           -x node_modules/* \
+          -x .env \
+          -x .env.production \
           -x .git/*
 
       - name: Include additional deployment files
         run: |
           cp .env.production ./.env
-          cp azure.yaml ./azure.yaml
-          cp requirements-prod.txt ./requirements-prod.txt
           
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -53,8 +55,6 @@ jobs:
           path: |
             release.zip
             .env
-            azure.yaml
-            requirements-prod.txt
 
   build-frontend:
     runs-on: ubuntu-latest
