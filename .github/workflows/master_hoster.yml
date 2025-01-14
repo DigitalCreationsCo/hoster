@@ -28,20 +28,33 @@ jobs:
           source venv/bin/activate
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-prod.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: |
+          zip release.zip ./* -r \
+          -x venv/* \
+          -x .venv/* \
+          -x node_modules/* \
+          -x .git/*
 
+      - name: Include additional deployment files
+        run: |
+          cp .env.production ./.env
+          cp azure.yaml ./azure.yaml
+          cp requirements-prod.txt ./requirements-prod.txt
+          
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: backend
           path: |
             release.zip
-            !venv/
+            .env
+            azure.yaml
+            requirements-prod.txt
 
   build-frontend:
     runs-on: ubuntu-latest
