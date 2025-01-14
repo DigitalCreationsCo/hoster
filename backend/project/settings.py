@@ -18,14 +18,14 @@ else:
     # Development settings
     prod = False
 
-if not prod:  # Running in a Test/Development environment
-    AZURE_CONNECTION_STRING = config('AZURE_CONNECTION_STRING', default='')
-    AZURE_CONTAINER_NAME = config('AZURE_CONTAINER_NAME', default='default-container')
+if not prod:
     AZURE_STORAGE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME', default="")
+    AZURE_STORAGE_CONNECTION_STRING = config('AZURE_STORAGE_CONNECTION_STRING', default='')
+    AZURE_CONTAINER_NAME = config('AZURE_CONTAINER_NAME', default='default-container')
     AZURE_STORAGE_ACCOUNT_KEY = config("AZURE_STORAGE_ACCOUNT_KEY", default="")
     STORAGE_BACKEND = config('STORAGE_BACKEND', default='azure')
     DEBUG = True
-    DEFAULT_SECRET = "a-secret-key"
+    DEFAULT_SECRET = config("DEFAULT_SECRET", default="default-secret")
     CSRF_TRUSTED_ORIGINS = [
         config("WEBSITE_HOSTNAME"),
     ]
@@ -33,12 +33,10 @@ if not prod:  # Running in a Test/Development environment
         CSRF_TRUSTED_ORIGINS.append(
             f"https://{config('CODESPACE_NAME')}-8000.{config('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN')}"
         )
-    
-
-else:  # Running in a Production environment
-    AZURE_CONNECTION_STRING = config('AZURE_CONNECTION_STRING', default='')
-    AZURE_CONTAINER_NAME = config('AZURE_CONTAINER_NAME', default='default-container')
+else:
     AZURE_STORAGE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME', default="")
+    AZURE_STORAGE_CONNECTION_STRING = config('AZURE_STORAGE_CONNECTION_STRING', default='')
+    AZURE_CONTAINER_NAME = config('AZURE_CONTAINER_NAME', default='default-container')
     AZURE_STORAGE_ACCOUNT_KEY = config("AZURE_STORAGE_ACCOUNT_KEY", default="")
     STORAGE_BACKEND = config('STORAGE_BACKEND', default='azure')
     DEBUG = False
@@ -56,7 +54,7 @@ CORS_ALLOWED_ORIGINS = [
         config("WEBSITE_HOSTNAME"),
     ]
 
-SECRET_KEY = config("A_SECRET_KEY", default=DEFAULT_SECRET)
+SECRET_KEY = config("SECRET_KEY", default=DEFAULT_SECRET)
 
 INSTALLED_APPS = [
     "django.contrib.admin",

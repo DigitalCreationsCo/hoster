@@ -8,9 +8,9 @@ init:
 # Populate .env file from Terraform outputs
 generate-env:
 	@echo "Running create-env.py..."
-	python ../scripts/create-env.py
+	python ../scripts/create-dev-env.py
 	@echo "Generating .env file from Terraform outputs..."
-	cd infra && terraform output -json | python ../scripts/get-azure-storage-env.py
+	cd infra && terraform output -json | python ../scripts/get-azure-storage-env-terraform.py
 
 # Full setup: Initialize Terraform, deploy, and generate .env
 setup: init generate-env

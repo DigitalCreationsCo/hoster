@@ -14,9 +14,9 @@ class AzureStorageBackend:
     def __init__(self):
         try:
             print('azure storage connection string')
-            print (settings.AZURE_CONNECTION_STRING)
+            print (settings.AZURE_STORAGE_CONNECTION_STRING)
             self.client = BlobServiceClient.from_connection_string(
-                settings.AZURE_CONNECTION_STRING, 
+                settings.AZURE_STORAGE_CONNECTION_STRING, 
             )
             self.container_name = settings.AZURE_CONTAINER_NAME
             self.account_name = settings.AZURE_STORAGE_ACCOUNT_NAME
