@@ -16,21 +16,51 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Cache Python dependencies
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip  # Cache pip dependencies
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-prod.txt') }}  # Cache key based on requirements file
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      # Cache pip dependencies (before installation)
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip  # Cache pip cache to avoid downloading packages each time
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-prod.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # Create and start virtual environment
       - name: Create and start virtual environment
         run: |
           python -m venv venv
           source venv/bin/activate
 
+      # Install dependencies (this is where the actual installation happens)
       - name: Install dependencies
         run: |
+          source venv/bin/activate
           pip install -r requirements-prod.txt
           pip install azure-cli
           pip install azure-identity azure-keyvault-secrets
+
+      # Cache virtual environment (after installation)
+      - name: Cache virtual environment
+        uses: actions/cache@v3
+        with:
+          path: venv  # Cache the virtual environment after dependencies have been installed
+          key: ${{ runner.os }}-python-${{ hashFiles('requirements-prod.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-python-
 
       # Authenticate with Azure using service principal
       - name: Log in to Azure
