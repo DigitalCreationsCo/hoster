@@ -7,15 +7,7 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 config = Config(RepositoryEnv(os.path.join(BASE_DIR, ".env")))
 
-# Determine the environment based on the IS_PRODUCTION variable
 IS_PRODUCTION = config('IS_PRODUCTION', default=False, cast=bool)
-
-# Set the appropriate .env file based on the environment
-env_file = '.env.production' if IS_PRODUCTION else '.env.development'
-# Load the selected .env file
-config = Config(RepositoryEnv(os.path.join(BASE_DIR, env_file)))
-
-# Use the config values
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Determine whether we're in production, as this will affect many settings.
@@ -32,8 +24,8 @@ if not prod:  # Running in a Test/Development environment
     AZURE_STORAGE_ACCOUNT_NAME = config('AZURE_STORAGE_ACCOUNT_NAME', default="")
     AZURE_STORAGE_ACCOUNT_KEY = config("AZURE_STORAGE_ACCOUNT_KEY", default="")
     STORAGE_BACKEND = config('STORAGE_BACKEND', default='azure')
-    DEBUG = True  # SECURITY WARNING: don't run with debug turned on in production!
-    DEFAULT_SECRET = "insecure-secret-key"
+    DEBUG = True
+    DEFAULT_SECRET = "a-secret-key"
     CSRF_TRUSTED_ORIGINS = [
         config("WEBSITE_HOSTNAME"),
     ]
@@ -64,7 +56,7 @@ CORS_ALLOWED_ORIGINS = [
         config("WEBSITE_HOSTNAME"),
     ]
 
-SECRET_KEY = config("SECRET_KEY", default=DEFAULT_SECRET)
+SECRET_KEY = config("A_SECRET_KEY", default=DEFAULT_SECRET)
 
 INSTALLED_APPS = [
     "django.contrib.admin",

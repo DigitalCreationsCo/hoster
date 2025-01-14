@@ -1,143 +1,110 @@
 ---
 page_type: sample
 languages:
-- azdeveloper
+- react
 - python
-- bicep
-- html
+- azure-cli
+- github-actions
 products:
 - azure
 - azure-app-service
 - azure-database-postgresql
-urlFragment: azure-django-postgres-flexible-appservice
-name: Deploy Django Application with PostgreSQL on Azure App Service (Python)
-description: This project deploys a web application for a space travel agency using Django with Python, and is set up for easy deployment with the Azure Developer CLI.
+urlFragment: django-react-azure-deployment
+name: Deploy Django + React Application with PostgreSQL on Azure
 ---
-<!-- YAML front-matter schema: https://review.learn.microsoft.com/en-us/help/contribute/samples/process/onboarding?branch=main#supported-metadata-fields-for-readmemd -->
 
-# Deploy Django Application with PostgreSQL via Azure App Service
+# Deploy Django + React Application with PostgreSQL on Azure
 
-This project deploys a web application for a space travel agency using Django. The application can be deployed to Azure with Azure App Service using the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/overview).
+This project deploys a full-stack web application with a Django backend and React frontend. It leverages Azure services for hosting and includes infrastructure automation with Azure Developer CLI (azd) and GitHub Actions.
 
-## Opening the project
+## Project Features
 
-This project has [Dev Container support](https://code.visualstudio.com/docs/devcontainers/containers), so it will be setup automatically if you open it in Github Codespaces or in local VS Code with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+- **Frontend Deployment**: React app hosted on Azure Blob Storage.
+- **Backend Deployment**: Django app hosted on Azure App Service.
+- **Database**: Azure PostgreSQL integrated with the Django application.
+- **Infrastructure Automation**: Azure resources provisioned using azd and GitHub workflows.
+- **Traffic Management**: Azure Application Gateway configured to route traffic efficiently.
 
-If you're *not* using one of those options for opening the project, then you'll need to:
+## Running the Project Locally
 
-1. Start up a local PostgreSQL server, create a database for the app, and set the following environment variables according to your database configuration.
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   ```
+2. Navigate to the project directory and set up the backend:
+   ```sh
+   cd backend
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+3. Set environment variables for the PostgreSQL database:
+   ```sh
+   export POSTGRES_HOST=<host>
+   export POSTGRES_PORT=<port>
+   export POSTGRES_DATABASE=<database_name>
+   export POSTGRES_USERNAME=<username>
+   export POSTGRES_PASSWORD=<password>
+   ```
+4. Apply database migrations and seed data:
+   ```sh
+   python3 manage.py migrate
+   python3 manage.py loaddata seed_data.json
+   ```
+5. Start the backend server:
+   ```sh
+   python3 manage.py runserver 8000
+   ```
+6. Navigate to the frontend directory and run the React app:
+   ```sh
+   cd ../frontend
+   npm install
+   npm start
+   ```
 
-```shell
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5432
-export POSTGRES_DATABASE=<YOUR DATABASE>
-export POSTGRES_USERNAME=<YOUR USERNAME>
-export POSTGRES_PASSWORD=<YOUR PASSWORD>
-```
+## Deployment Steps
 
-1. Create a [Python virtual environment](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) and activate it.
+### Prerequisites
 
-1. Install production requirements:
+1. Sign up for an [Azure account](https://azure.microsoft.com/free/).
+2. Install the [Azure Developer CLI (azd)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
+3. Authenticate with Azure:
+   ```sh
+   azd auth login
+   ```
 
-    ```sh
-    python3 -m pip install -r backend/requirements.txt
-    ```
+### Deployment Process
 
+1. Initialize the azd project:
+   ```sh
+   azd init
+   ```
+2. Provision resources and deploy the application:
+   ```sh
+   azd up
+   ```
+   Follow the prompts to provide an environment name, Azure subscription, and resource location.
 
-1. Apply database migrations and seed initial data:
+3. For subsequent deployments after code changes:
+   ```sh
+   azd deploy
+   ```
 
-    ```sh
-    python3 backend/manage.py migrate
-    python3 backend/manage.py loaddata backend/seed_data.json
-    ```
+### CI/CD Pipeline
 
-## Running locally
+This project includes GitHub workflows for automatic deployments. To configure:
 
-If you're running the app inside VS Code or GitHub Codespaces, you can use the "Run and Debug" button to start the app.
+1. Run the following command to set up pipeline secrets:
+   ```sh
+   azd pipeline config
+   ```
+2. Push your changes to the `main` branch to trigger the workflow.
 
-```sh
-python3 backend/manage.py runserver 8000
-```
+## Additional Notes
 
-### Admin
+- **Terraform Support**: Terraform scripts are included for infrastructure setup but require a compatible environment with `azure-cli` installed.
+- **Live Application**: Access the live app [here](Insert-live-link).
 
-This app comes with the built-in Django admin interface.
+---
 
-1. Create a superuser:
-
-```
-python3 backend/manage.py createsuperuser
-```
-
-2. Restart the server and navigate to "/admin"
-
-3. Login with the superuser credentials.
-
-## Running tests
-
-1. Install the development requirements:
-
-    ```sh
-    python3 -m pip install -r requirements-dev.txt
-    python3 -m playwright install chromium --with-deps
-    ```
-
-2. Run the tests:
-
-    ```sh
-    python3 -m pytest
-    ```
-
-## Deployment
-
-This repo is set up for deployment on Azure via Azure App Service.
-
-Steps for deployment:
-
-1. Sign up for a [free Azure account](https://azure.microsoft.com/free/) and create an Azure Subscription.
-2. Install the [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd). (If you open this repository in Codespaces or with the VS Code Dev Containers extension, that part will be done for you.)
-3. Login to Azure:
-
-    ```shell
-    azd auth login
-    ```
-4. Set up the azd project: If you haven’t initialized your project yet, navigate to the project root directory and run:
-
-    ```shell
-    azd init
-    ```
-
-5. Provision and deploy all the resources:
-
-    ```shell
-    azd up
-    ```
-
-    It will prompt you to provide an `azd` environment name (like "myapp"), select a subscription from your Azure account, and select a location (like "eastus"). Then it will provision the resources in your account and deploy the latest code. If you get an error with deployment, changing the location can help, as there may be availability constraints for some of the resources.
-
-6. When `azd` has finished deploying, you'll see an endpoint URI in the command output. Visit that URI, and you should see the front page of the app! 🎉
-
-7. When you've made any changes to the app code, you can just run:
-
-    ```shell
-    azd deploy
-    ```
-
-### CI/CD pipeline
-
-This project includes a Github workflow for deploying the resources to Azure
-on every push to main. That workflow requires several Azure-related authentication secrets
-to be stored as Github action secrets. To set that up, run:
-
-```shell
-azd pipeline config
-```
-### Terraform
-
-This projectuses terraform toenable preview and deployment of cloud infrastructure.
-The implementation leverages remote terraform state in Azure storage, for the following benefits:
-To allow shared access to the state data, and allow multiple people work together on that collection of infrastructure resources
-To avoid exposing sensitive information included in state file
-To decrease the chance of inadvertent deletion because of storing state locally
-
-* The azure storage account and storage container used as the terraform backend, is initialized and provisioned by terraform in `infra/create-remote-storage.tf`
+For any issues or questions, feel free to contact Bryant Mejia at bryantmejia722@outlook.com.
