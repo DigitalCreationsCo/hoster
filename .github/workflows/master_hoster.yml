@@ -184,7 +184,7 @@ jobs:
         with:
           app-name: 'hoster'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_337529ED7DC34EE2895AC04F10880895 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
 
       # Deploy frontend
       - name: Download frontend artifact
