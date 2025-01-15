@@ -97,22 +97,23 @@ jobs:
 
       - name: Zip artifact for deployment
         run: |
+          echo "Current directory contents:"
+          ls -la
+          
+          echo "Creating deployment package..."
           zip release.zip ./* -r \
-          -x venv/* \
-          -x .venv/* \
-          -x frontend/* \
-          -x infra/* \
-          -x scripts/* \
-          -x node_modules/* \
-          -x .env \
-          -x .env.production \
-          -x .git/*
-          -x .vscode/*
+          -x "venv/*" \
+          -x ".venv/*" \
+          -x "frontend/*" \
+          -x "infra/*" \
+          -x "node_modules/*" \
+          -x ".git/*" \
           -x "__pycache__/*" \
           -x "*.pyc" \
-          -x "tests/*" \
-          -x "*.log" \
-          -x ".pytest_cache/*"
+          -x "tests/*"
+          
+          echo "Final zip contents:"
+          unzip -l release.zip
 
       - name: Check deployment package size
         run: ls -lh release.zip
