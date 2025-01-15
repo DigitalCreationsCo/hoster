@@ -92,7 +92,7 @@ jobs:
         uses: azure/get-keyvault-secrets@v1
         with:
           keyvault: "hoster-secrets"
-          secrets: 'PGPW, PGDB, PGH, PGPORT, PGSSL, PGUSER, AZURE-STORAGE-CONNECTION-STRING'
+          secrets: 'PGPW, PGDB, PGH, PGPORT, PGSSL, PGUSER, STORAGE'
         id: getazuresecrets
 
       - name: Set environment variables
@@ -103,7 +103,7 @@ jobs:
           echo "POSTGRES_PORT=${{ steps.getazuresecrets.outputs.PGPORT }}" >> $GITHUB_ENV
           echo "POSTGRES_SSL=${{ steps.getazuresecrets.outputs.PGSSL }}" >> $GITHUB_ENV
           echo "POSTGRES_USER=${{ steps.getazuresecrets.outputs.PGUSER }}" >> $GITHUB_ENV
-          echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.AZURE-STORAGE-CONNECTION-STRING }}" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.STORAGE }}" >> $GITHUB_ENV
           echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
           echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
  
