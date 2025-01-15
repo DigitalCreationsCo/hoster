@@ -104,7 +104,9 @@ jobs:
           echo "POSTGRES_SSL=${{ steps.getazuresecrets.outputs.PGSSL }}" >> $GITHUB_ENV
           echo "POSTGRES_USER=${{ steps.getazuresecrets.outputs.PGUSER }}" >> $GITHUB_ENV
           echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.AZURE-STORAGE-CONNECTION-STRING }}" >> $GITHUB_ENV
-
+          echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+          echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
+ 
       # Run the create-prod-env.py script to generate .env.production file
       - name: Create production environment file
         run: |
@@ -167,7 +169,7 @@ jobs:
       
       - name: Set frontend environment variables
         run: |
-          echo "VITE_BACKEND_URL=" >> $GITHUB_ENV
+          echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
 
       - name: Build frontend
         run: |

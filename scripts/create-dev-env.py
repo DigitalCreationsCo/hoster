@@ -74,6 +74,8 @@ def create_dev_env():
     env_vars["APPLICATIONINSIGHTS_CONNECTION_STRING"] = fetch_azure_value("APPLICATIONINSIGHTS_CONNECTION_STRING")
 
     env_vars["WEBSITE_HOSTNAME"] = "localhost:5173"
+    env_vars["BACKEND_URL"] = ""
+
     if os.getenv("CODESPACE_NAME"):
         env_vars["GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"] = os.getenv('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN', '')
 
