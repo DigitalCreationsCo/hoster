@@ -130,7 +130,7 @@ jobs:
           -x "./tests/*"
           
           echo "Final zip contents:"
-          unzip -l release.zip | grep -i "venv" # This will specifically show if venv is included
+          unzip -l release.zip | grep -i "venv"
           echo "Full zip contents:"
           unzip -l release.zip
 
