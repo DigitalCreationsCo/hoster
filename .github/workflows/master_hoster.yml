@@ -95,6 +95,11 @@ jobs:
           secrets: 'PGPW, PGDB, PGH, PGPORT, PGSSL, PGUSER, STORAGE'
         id: getazuresecrets
 
+      # Run the create-prod-env.py script to generate .env.production file
+      - name: Create production environment file
+        run: |
+          python scripts/create-prod-env.py
+
       - name: Set environment variables
         run: |
           echo "POSTGRES_PASSWORD=${{ steps.getazuresecrets.outputs.PGPW }}" >> $GITHUB_ENV
@@ -106,11 +111,8 @@ jobs:
           echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.STORAGE }}" >> $GITHUB_ENV
           echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
           echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
- 
-      # Run the create-prod-env.py script to generate .env.production file
-      - name: Create production environment file
-        run: |
-          python scripts/create-prod-env.py
+          echo "AZURE_STORAGE_ACCOUNT_NAME=$(az storage account list --query '[0].name' -o tsv)" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name ${AZURE_STORAGE_ACCOUNT_NAME} --resource-group 'hoster' --query '[0].value' -o tsv)" >> $GITHUB_ENV
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -171,7 +173,7 @@ jobs:
       
       - name: Set frontend environment variables
         run: |
-          echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+          echo "VITE_BACKEND_URL=${{ needs.build-backend.outputs.BACKEND_URL }}" >> $GITHUB_ENV
 
       - name: Build frontend
         run: |
@@ -189,7 +191,7 @@ jobs:
     needs: [build-backend, build-frontend]
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      url: ${{ steps.deploy-backend.outputs.webapp-url }}
     
     steps:
       - name: Download backend artifact
@@ -228,17 +230,16 @@ jobs:
           name: frontend
 
       - name: Upload frontend to Azure Blob Storage
-        env:
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
-          AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
         run: |
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }}"
+          echo "AZURE_STORAGE_ACCOUNT_KEY=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_KEY }}"
           az storage blob upload-batch \
-            --account-name $AZURE_STORAGE_ACCOUNT \
-            --account-key $AZURE_STORAGE_KEY \
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
+            --account-key $AZURE_STORAGE_ACCOUNT_KEY \
             --destination '$web' \
             --source frontend/dist
 
       - name: Verify deployment
         run: |
           echo "Backend URL: ${{ steps.deploy-backend.outputs.webapp-url }}"
-          echo "Frontend URL : https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.blob.core.windows.net"
+          echo "Frontend URL : https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
