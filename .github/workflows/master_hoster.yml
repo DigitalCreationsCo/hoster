@@ -107,6 +107,15 @@ jobs:
           -x .env \
           -x .env.production \
           -x .git/*
+          -x .vscode/*
+          -x "__pycache__/*" \
+          -x "*.pyc" \
+          -x "tests/*" \
+          -x "*.log" \
+          -x ".pytest_cache/*"
+
+      - name: Check deployment package size
+        run: ls -lh release.zip
 
       - name: Include additional deployment files
         run: |
@@ -185,6 +194,8 @@ jobs:
           app-name: 'hoster'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: '.'
+          verbose: true
 
       # Deploy frontend
       - name: Download frontend artifact
