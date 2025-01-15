@@ -131,10 +131,12 @@ jobs:
           -x "./*.pyc" \
           -x "./tests/*"
           
-          echo "Final zip contents:"
-          unzip -l release.zip | grep -i "venv"
-          echo "Full zip contents:"
-          unzip -l release.zip
+          # echo "Final zip contents:"
+          # unzip -l release.zip | grep -i "venv"
+          # echo "Full zip contents:"
+          # unzip -l release.zip
+          echo "check created zip:"
+          ls
 
       - name: Check deployment package size
         run: ls -lh release.zip
