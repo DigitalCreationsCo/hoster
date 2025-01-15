@@ -91,7 +91,7 @@ jobs:
       - name: Get Azure Key Vault Secrets
         uses: azure/get-keyvault-secrets@v1
         with:
-          keyvault: "hoster-secrets"  # Name of your key vault
+          keyvault: "hoster-secrets"
           secrets: 'PGPW, PGDB, PGH, PGPORT, PGSSL, PGUSER, AZURE-STORAGE-CONNECTION-STRING'
         id: getazuresecrets
 
