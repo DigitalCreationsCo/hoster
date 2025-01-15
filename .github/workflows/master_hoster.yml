@@ -101,18 +101,20 @@ jobs:
           ls -la
           
           echo "Creating deployment package..."
-          zip release.zip ./* -r \
-          -x "venv/*" \
-          -x ".venv/*" \
-          -x "frontend/*" \
-          -x "infra/*" \
-          -x "node_modules/*" \
-          -x ".git/*" \
-          -x "__pycache__/*" \
-          -x "*.pyc" \
-          -x "tests/*"
+          zip release.zip ./* ./.* -r \
+          -x "./venv/*" \
+          -x "./.venv/*" \
+          -x "./frontend/*" \
+          -x "./infra/*" \
+          -x "./node_modules/*" \
+          -x "./.git/*" \
+          -x "./__pycache__/*" \
+          -x "./*.pyc" \
+          -x "./tests/*"
           
           echo "Final zip contents:"
+          unzip -l release.zip | grep -i "venv" # This will specifically show if venv is included
+          echo "Full zip contents:"
           unzip -l release.zip
 
       - name: Check deployment package size
