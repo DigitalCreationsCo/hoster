@@ -77,17 +77,34 @@ jobs:
           echo "AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
           echo "AZURE_CREDENTIALS=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
 
-      - name: Fetch secrets from Azure Key Vault
-        continue-on-error: false
-        run: |
-          echo "POSTGRES_PASSWORD=$(az keyvault secret show --name PGPW --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "POSTGRES_DB=$(az keyvault secret show --name PGDB --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "POSTGRES_HOST=$(az keyvault secret show --name PGH --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "POSTGRES_PORT=$(az keyvault secret show --name PGPORT --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "POSTGRES_SSL=$(az keyvault secret show --name PGSSL --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "POSTGRES_USER=$(az keyvault secret show --name PGUSER --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
-          echo "AZURE_STORAGE_CONNECTION_STRING=$(az keyvault secret show --name PGUSER --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      # - name: Fetch secrets from Azure Key Vault
+      #   continue-on-error: false
+      #   run: |
+      #     echo "POSTGRES_PASSWORD=$(az keyvault secret show --name PGPW --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "POSTGRES_DB=$(az keyvault secret show --name PGDB --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "POSTGRES_HOST=$(az keyvault secret show --name PGH --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "POSTGRES_PORT=$(az keyvault secret show --name PGPORT --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "POSTGRES_SSL=$(az keyvault secret show --name PGSSL --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "POSTGRES_USER=$(az keyvault secret show --name PGUSER --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
+      #     echo "AZURE_STORAGE_CONNECTION_STRING=$(az keyvault secret show --name PGUSER --vault-name hoster-secrets --query value -o tsv)" >> $GITHUB_ENV
           
+      - name: Get Azure Key Vault Secrets
+        uses: azure/get-keyvault-secrets@v1
+        with:
+          keyvault: "hoster-secrets"  # Name of your key vault
+          secrets: 'PGPW, PGDB, PGH, PGPORT, PGSSL, PGUSER, AZURE-STORAGE-CONNECTION-STRING'
+        id: getazuresecrets
+
+      - name: Set environment variables
+        run: |
+          echo "POSTGRES_PASSWORD=${{ steps.getazuresecrets.outputs.PGPW }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB=${{ steps.getazuresecrets.outputs.PGDB }}" >> $GITHUB_ENV
+          echo "POSTGRES_HOST=${{ steps.getazuresecrets.outputs.PGH }}" >> $GITHUB_ENV
+          echo "POSTGRES_PORT=${{ steps.getazuresecrets.outputs.PGPORT }}" >> $GITHUB_ENV
+          echo "POSTGRES_SSL=${{ steps.getazuresecrets.outputs.PGSSL }}" >> $GITHUB_ENV
+          echo "POSTGRES_USER=${{ steps.getazuresecrets.outputs.PGUSER }}" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.AZURE-STORAGE-CONNECTION-STRING }}" >> $GITHUB_ENV
+
       # Run the create-prod-env.py script to generate .env.production file
       - name: Create production environment file
         run: |
