@@ -299,11 +299,15 @@ jobs:
           package: '.'
           verbose: true
 
+      - name: Ensure frontend/dist directory exists
+        run: mkdir -p frontend/dist
+        
       # Deploy frontend
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
           name: dist
+          path: frontend/dist
      
       - name: Verify frontend artifact
         run: |
