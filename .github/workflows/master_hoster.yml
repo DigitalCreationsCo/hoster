@@ -134,7 +134,19 @@ jobs:
           echo "AZURE_STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT}" >> $GITHUB_OUTPUT
           echo "AZURE_STORAGE_ACCOUNT_KEY=${STORAGE_KEY}" >> $GITHUB_OUTPUT
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_OUTPUT
+          if [ -z "$BACKEND_URL" ]; then
+            echo "Error: BACKEND_URL is empty or not found."
+            exit 1
+          else
+            echo "BACKEND_URL: $BACKEND_URL"
+          fi
           echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_OUTPUT
+          if [ -z "$WEBSITE_HOSTNAME" ]; then
+            echo "Error: WEBSITE_HOSTNAME is empty or not found."
+            exit 1
+          else
+            echo "WEBSITE_HOSTNAME: $WEBSITE_HOSTNAME"
+          fi
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -206,7 +218,7 @@ jobs:
       - name: Upload frontend bundle
         uses: actions/upload-artifact@v4
         with:
-          name: frontend
+          name: dist
           path: frontend/dist
 
   deploy:
