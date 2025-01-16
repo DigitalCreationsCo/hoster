@@ -219,14 +219,16 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          export "AZURE_STORAGE_ACCOUNT_NAME=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }}" 
+          echo "AZURE_STORAGE_ACCOUNT_NAME=$AZURE_STORAGE_ACCOUNT_NAME" >> $GITHUB_ENV
           if [ -z "$AZURE_STORAGE_ACCOUNT_NAME" ]; then
             echo "Error: AZURE_STORAGE_ACCOUNT_NAME is empty or not found."
             exit 1
           else
             echo "AZURE_STORAGE_ACCOUNT_NAME: $AZURE_STORAGE_ACCOUNT_NAME"
           fi
-          echo "AZURE_STORAGE_ACCOUNT_KEY=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+          export "AZURE_STORAGE_ACCOUNT_KEY=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_KEY }}"
+          echo "AZURE_STORAGE_ACCOUNT_KEY=$AZURE_STORAGE_ACCOUNT_KEY" >> $GITHUB_ENV
           if [ -z "$AZURE_STORAGE_ACCOUNT_KEY" ]; then
             echo "Error: AZURE_STORAGE_ACCOUNT_KEY is empty or not found."
             exit 1
