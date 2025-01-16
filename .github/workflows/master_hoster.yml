@@ -217,6 +217,11 @@ jobs:
       url: ${{ steps.deploy-backend.outputs.webapp-url }}
     
     steps:
+      - name: Set environment variables
+        run: |
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_ACCOUNT_KEY=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_KEY }}" >> $GITHUB_ENV
+
       - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
@@ -254,8 +259,6 @@ jobs:
 
       - name: Upload frontend to Azure Blob Storage
         run: |
-          echo "AZURE_STORAGE_ACCOUNT_NAME=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }}"
-          echo "AZURE_STORAGE_ACCOUNT_KEY=${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_KEY }}"
           az storage blob upload-batch \
             --account-name $AZURE_STORAGE_ACCOUNT_NAME \
             --account-key $AZURE_STORAGE_ACCOUNT_KEY \
