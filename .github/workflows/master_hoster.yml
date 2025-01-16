@@ -43,6 +43,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-python-
 
+      - name: Refresh Azure Credentials
+        run: az account clear
+        
       # Authenticate with Azure using service principal
       - name: Log in to Azure
         uses: azure/login@v2
