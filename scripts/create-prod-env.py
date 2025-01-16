@@ -61,7 +61,7 @@ def create_prod_env():
     # env_vars["POSTGRES_PORT"] = config("POSTGRES_PORT", default=5432)
 
     env_vars["WEBSITE_HOSTNAME"] = "https://tfstate00002.blob.core.windows.net/$web"
-    env_vars["BACKEND_URL"] = ""
+    env_vars["BACKEND_URL"] = "placeholder-backend-url"
     # Write the environment variables to the .env file
     write_to_env_file(env_vars, ".env.production")
 
