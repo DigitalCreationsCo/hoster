@@ -136,6 +136,7 @@ jobs:
           
           echo "Creating deployment package..."
           zip release.zip ./* ./.* -r \
+          -x "./.venv/*" \
           -x "./venv/*" \
           -x "./frontend/*" \
           -x "./infra/*" \
