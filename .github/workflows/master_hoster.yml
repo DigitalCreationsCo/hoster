@@ -20,28 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip  # Cache pip dependencies
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-prod.txt') }}  # Cache key based on requirements file
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      # Cache pip dependencies (before installation)
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip  # Cache pip cache to avoid downloading packages each time
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements-prod.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       # Create and start virtual environment
       - name: Create and start virtual environment
         run: |
@@ -289,6 +267,9 @@ jobs:
       - name: Unzip backend artifact
         run: unzip release.zip
 
+      - name: Set execute permissions for entrypoint
+        run: chmod +x backend/entrypoint.sh
+
       - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-backend
@@ -298,10 +279,13 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: '.'
           verbose: true
+          startup-command: |
+            python -m pip install -r requirements-prod.txt && 
+            bash backend/entrypoint.sh
 
       - name: Ensure frontend/dist directory exists
         run: mkdir -p frontend/dist
-        
+
       # Deploy frontend
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
