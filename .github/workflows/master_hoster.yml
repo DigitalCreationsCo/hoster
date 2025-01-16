@@ -129,6 +129,10 @@ jobs:
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
+      - name: Include additional deployment files
+        run: |
+          cp .env.production ./.env
+
       - name: Zip artifact for deployment
         run: |
           echo "Current directory contents:"
@@ -139,6 +143,8 @@ jobs:
           -x "./.venv/*" \
           -x "./venv/*" \
           -x "./frontend/*" \
+          -x "./.env.production/*" \
+          -x "./entrypoint.sh" \
           -x "./infra/*" \
           -x "./node_modules/*" \
           -x "./.git/*" \
@@ -155,10 +161,6 @@ jobs:
 
       - name: Check deployment package size
         run: ls -lh release.zip
-
-      - name: Include additional deployment files
-        run: |
-          cp .env.production ./.env
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
