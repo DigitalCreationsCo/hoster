@@ -104,6 +104,9 @@ jobs:
 
       - name: Set environment variables
         run: |
+          while IFS= read -r line; do
+            echo "$line" >> $GITHUB_ENV
+          done < .env.production
           echo "POSTGRES_PASSWORD=${{ steps.getazuresecrets.outputs.PGPW }}" >> $GITHUB_ENV
           echo "POSTGRES_DB=${{ steps.getazuresecrets.outputs.PGDB }}" >> $GITHUB_ENV
           echo "POSTGRES_HOST=${{ steps.getazuresecrets.outputs.PGH }}" >> $GITHUB_ENV
@@ -111,8 +114,6 @@ jobs:
           echo "POSTGRES_SSL=${{ steps.getazuresecrets.outputs.PGSSL }}" >> $GITHUB_ENV
           echo "POSTGRES_USER=${{ steps.getazuresecrets.outputs.PGUSER }}" >> $GITHUB_ENV
           echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.STORAGE }}" >> $GITHUB_ENV
-          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
-          echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
 
       - name: Output shared variables
         id: setvars
