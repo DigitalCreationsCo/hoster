@@ -24,7 +24,7 @@ jobs:
       - name: Create and start virtual environment
         run: |
           python -m venv .venv
-          source venv/bin/activate
+          source .venv/bin/activate
 
       # Install dependencies (this is where the actual installation happens)
       - name: Install dependencies
