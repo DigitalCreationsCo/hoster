@@ -306,8 +306,8 @@ jobs:
      
       - name: Verify frontend artifact
         run: |
-        echo "Verify frontend artifact"
-        ls -la
+          echo "Verify frontend artifact"
+          ls -la
 
       - name: Upload frontend to Azure Blob Storage
         run: |
