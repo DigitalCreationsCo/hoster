@@ -234,7 +234,27 @@ jobs:
             exit 1
           else
             echo "AZURE_STORAGE_ACCOUNT_KEY: $AZURE_STORAGE_ACCOUNT_KEY"
-          fi 
+          fi
+
+      - name: Output shared variables
+        id: setvars
+        run: |
+          STORAGE_ACCOUNT=$(az storage account list --query '[0].name' -o tsv)
+          if [ -z "$STORAGE_ACCOUNT" ]; then
+            echo "Error: STORAGE_ACCOUNT is empty or not found."
+            exit 1
+          else
+            echo "STORAGE_ACCOUNT: $STORAGE_ACCOUNT"
+          fi
+          STORAGE_KEY=$(az storage account keys list --account-name ${STORAGE_ACCOUNT} --resource-group 'hoster' --query '[0].value' -o tsv)
+          if [ -z "$STORAGE_KEY" ]; then
+            echo "Error: STORAGE_KEY is empty or not found."
+            exit 1
+          else
+            echo "STORAGE_KEY: $STORAGE_KEY"
+          fi
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT}" >> $GITHUB_ENV
+          echo "AZURE_STORAGE_ACCOUNT_KEY=${STORAGE_KEY}" >> $GITHUB_ENV
 
       - name: Download backend artifact
         uses: actions/download-artifact@v4
