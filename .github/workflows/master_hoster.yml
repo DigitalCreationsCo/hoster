@@ -302,7 +302,12 @@ jobs:
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend
+          name: dist
+     
+      - name: Verify frontend artifact
+        run: |
+        echo "Verify frontend artifact"
+        ls -la
 
       - name: Upload frontend to Azure Blob Storage
         run: |
