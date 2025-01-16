@@ -23,13 +23,13 @@ jobs:
       # Create and start virtual environment
       - name: Create and start virtual environment
         run: |
-          python -m venv venv
+          python -m venv .venv
           source venv/bin/activate
 
       # Install dependencies (this is where the actual installation happens)
       - name: Install dependencies
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           pip install -r requirements-prod.txt
           pip install azure-cli
           pip install azure-identity azure-keyvault-secrets
@@ -38,7 +38,7 @@ jobs:
       - name: Cache virtual environment
         uses: actions/cache@v3
         with:
-          path: venv  # Cache the virtual environment after dependencies have been installed
+          path: .venv  # Cache the virtual environment after dependencies have been installed
           key: ${{ runner.os }}-python-${{ hashFiles('requirements-prod.txt') }}
           restore-keys: |
             ${{ runner.os }}-python-
@@ -137,7 +137,6 @@ jobs:
           echo "Creating deployment package..."
           zip release.zip ./* ./.* -r \
           -x "./venv/*" \
-          -x "./.venv/*" \
           -x "./frontend/*" \
           -x "./infra/*" \
           -x "./node_modules/*" \
@@ -147,7 +146,7 @@ jobs:
           -x "./tests/*"
           
           # echo "Final zip contents:"
-          # unzip -l release.zip | grep -i "venv"
+          # unzip -l release.zip | grep -i ".venv"
           # echo "Full zip contents:"
           # unzip -l release.zip
           echo "check created zip:"
@@ -166,6 +165,7 @@ jobs:
           name: backend
           path: |
             release.zip
+            entrypoint.sh
             .env
 
   build-frontend:
@@ -268,7 +268,7 @@ jobs:
         run: unzip release.zip
 
       - name: Set execute permissions for entrypoint
-        run: chmod +x backend/entrypoint.sh
+        run: chmod +x entrypoint.sh
 
       - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -280,8 +280,7 @@ jobs:
           package: '.'
           verbose: true
           startup-command: |
-            python -m pip install -r requirements-prod.txt && 
-            bash backend/entrypoint.sh
+            bash entrypoint.sh
 
       - name: Ensure frontend/dist directory exists
         run: mkdir -p frontend/dist
