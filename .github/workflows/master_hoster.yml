@@ -114,7 +114,8 @@ jobs:
           echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.STORAGE }}" >> $GITHUB_ENV
           echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
           echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
-          echo "AZURE_STORAGE_ACCOUNT_NAME=$(az storage account list --query '[0].name' -o tsv)" >> $GITHUB_ENV
+          export AZURE_STORAGE_ACCOUNT_NAME=$(az storage account list --query '[0].name' -o tsv)
+          echo "AZURE_STORAGE_ACCOUNT_NAME=$AZURE_STORAGE_ACCOUNT_NAME" >> $GITHUB_ENV
           echo "AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name ${AZURE_STORAGE_ACCOUNT_NAME} --resource-group 'hoster' --query '[0].value' -o tsv)" >> $GITHUB_ENV
 
       - name: Output shared variables
