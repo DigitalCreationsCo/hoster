@@ -12,11 +12,14 @@ permissions:
 jobs:
   build-backend:
     runs-on: ubuntu-latest
+    outputs:
+      AZURE_STORAGE_ACCOUNT_NAME: ${{ steps.setvars.outputs.AZURE_STORAGE_ACCOUNT_NAME }}
+      AZURE_STORAGE_ACCOUNT_KEY: ${{ steps.setvars.outputs.AZURE_STORAGE_ACCOUNT_KEY }}
+      BACKEND_URL: ${{ steps.setvars.outputs.BACKEND_URL }}
 
     steps:
       - uses: actions/checkout@v4
 
-      # Cache Python dependencies
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
@@ -109,10 +112,21 @@ jobs:
           echo "POSTGRES_SSL=${{ steps.getazuresecrets.outputs.PGSSL }}" >> $GITHUB_ENV
           echo "POSTGRES_USER=${{ steps.getazuresecrets.outputs.PGUSER }}" >> $GITHUB_ENV
           echo "AZURE_STORAGE_CONNECTION_STRING=${{ steps.getazuresecrets.outputs.STORAGE }}" >> $GITHUB_ENV
-          echo "VITE_BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_ENV
           echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_ENV
           echo "AZURE_STORAGE_ACCOUNT_NAME=$(az storage account list --query '[0].name' -o tsv)" >> $GITHUB_ENV
           echo "AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list --account-name ${AZURE_STORAGE_ACCOUNT_NAME} --resource-group 'hoster' --query '[0].value' -o tsv)" >> $GITHUB_ENV
+
+      - name: Output shared variables
+        id: setvars
+        run: |
+          STORAGE_ACCOUNT=$(az storage account list --query '[0].name' -o tsv)
+          STORAGE_KEY=$(az storage account keys list --account-name ${STORAGE_ACCOUNT} --resource-group 'hoster' --query '[0].value' -o tsv)
+          
+          echo "AZURE_STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT}" >> $GITHUB_OUTPUT
+          echo "AZURE_STORAGE_ACCOUNT_KEY=${STORAGE_KEY}" >> $GITHUB_OUTPUT
+          echo "BACKEND_URL=$BACKEND_URL" >> $GITHUB_OUTPUT
+          echo "WEBSITE_HOSTNAME=$WEBSITE_HOSTNAME" >> $GITHUB_OUTPUT
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
@@ -174,6 +188,7 @@ jobs:
       - name: Set frontend environment variables
         run: |
           echo "VITE_BACKEND_URL=${{ needs.build-backend.outputs.BACKEND_URL }}" >> $GITHUB_ENV
+          echo "WEBSITE_HOSTNAME=${{ needs.build-backend.outputs.WEBSITE_HOSTNAME }}" >> $GITHUB_ENV
 
       - name: Build frontend
         run: |
