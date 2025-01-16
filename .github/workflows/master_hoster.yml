@@ -278,7 +278,7 @@ jobs:
           az webapp config set \
             --resource-group hoster \
             --name hoster \
-            --startup-command "bash entrypoint.sh"
+            --startup-file "entrypoint.sh"
             
       - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v3
