@@ -45,7 +45,7 @@ jobs:
 
       - name: Refresh Azure Credentials
         run: az account clear
-        
+
       # Authenticate with Azure using service principal
       - name: Log in to Azure
         uses: azure/login@v2
@@ -315,6 +315,7 @@ jobs:
             --account-key $AZURE_STORAGE_ACCOUNT_KEY \
             --destination '$web' \
             --source frontend/dist
+            --overwrite
 
       - name: Verify deployment
         run: |
