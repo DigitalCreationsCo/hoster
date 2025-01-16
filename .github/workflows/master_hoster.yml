@@ -273,6 +273,13 @@ jobs:
       - name: Set execute permissions for entrypoint
         run: chmod +x entrypoint.sh
 
+      - name: Set startup command
+        run: |
+          az webapp config set \
+            --resource-group hoster \
+            --name hoster \
+            --startup-command "bash entrypoint.sh"
+            
       - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-backend
@@ -282,8 +289,6 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: '.'
           verbose: true
-          startup-command: |
-            bash entrypoint.sh
 
       - name: Ensure frontend/dist directory exists
         run: mkdir -p frontend/dist
