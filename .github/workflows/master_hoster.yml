@@ -391,21 +391,20 @@ jobs:
             --output tsv)
           echo "STATIC_WEBSITE_URL=${STATIC_WEBSITE_URL}" >> $GITHUB_OUTPUT
 
-    
-
-      - name: Create CDN profile and endpoint
-        run: |
-          az cdn profile create \
-            --name hoster-cdn \
-            --resource-group hoster \
-            --sku Standard_Microsoft
+      # CDN is restricted for free subscription account
+      # - name: Create CDN profile and endpoint
+      #   run: |
+      #     az cdn profile create \
+      #       --name hoster-cdn \
+      #       --resource-group hoster \
+      #       --sku Standard_Microsoft
           
-          az cdn endpoint create \
-            --name hoster \
-            --profile-name hoster-cdn \
-            --resource-group hoster \
-            --origin ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net \
-            --origin-host-header ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net
+      #     az cdn endpoint create \
+      #       --name hoster \
+      #       --profile-name hoster-cdn \
+      #       --resource-group hoster \
+      #       --origin ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net \
+      #       --origin-host-header ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net
 
       - name: Verify deployment
         run: |
