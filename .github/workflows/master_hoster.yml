@@ -296,6 +296,14 @@ jobs:
       - name: Ensure frontend/dist directory exists
         run: mkdir -p frontend/dist
 
+      - name: Enable static website hosting
+        run: |
+          az storage blob service-properties update \
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
+            --static-website \
+            --404-document error.html \
+            --index-document index.html
+            
       # Deploy frontend
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
@@ -317,7 +325,40 @@ jobs:
             --source frontend/dist \
             --overwrite
 
+      - name: Get frontend URL
+        id: get_frontend_url
+        run: |
+          STATIC_WEBSITE_URL=$(az storage account show \
+            --name $AZURE_STORAGE_ACCOUNT_NAME \
+            --query "primaryEndpoints.web" \
+            --output tsv)
+          echo "STATIC_WEBSITE_URL=${STATIC_WEBSITE_URL}" >> $GITHUB_OUTPUT
+
+      - name: Configure CORS for storage account
+        run: |
+          az storage cors add \
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
+            --origins "*" \
+            --methods GET HEAD OPTIONS \
+            --allowed-headers "*" \
+            --exposed-headers "*" \
+            --services b
+
+      - name: Create CDN profile and endpoint
+        run: |
+          az cdn profile create \
+            --name hoster-cdn \
+            --resource-group hoster \
+            --sku Standard_Microsoft
+          
+          az cdn endpoint create \
+            --name hoster \
+            --profile-name hoster-cdn \
+            --resource-group hoster \
+            --origin ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net \
+            --origin-host-header ${AZURE_STORAGE_ACCOUNT_NAME}.z##.web.core.windows.net
+
       - name: Verify deployment
         run: |
           echo "Backend URL: ${{ steps.deploy-backend.outputs.webapp-url }}"
-          echo "Frontend URL : https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
+          echo "Frontend URL: ${{ steps.get_url.outputs.STATIC_WEBSITE_URL }}"
