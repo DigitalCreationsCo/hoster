@@ -359,9 +359,7 @@ jobs:
           az webapp cors add \
             --resource-group hoster \
             --name hoster \
-            --allowed-origins "https://${AZURE_STORAGE_ACCOUNT_NAME}.z*.web.core.windows.net" \
-            --allowed-methods "GET POST PUT DELETE OPTIONS" \
-            --allowed-headers "Authorization,Content-Type,Accept"
+            --allowed-origins "https://${AZURE_STORAGE_ACCOUNT_NAME}.z*.web.core.windows.net"
 
       # Deploy frontend
       - name: Download frontend artifact
