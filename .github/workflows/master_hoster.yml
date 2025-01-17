@@ -192,8 +192,8 @@ jobs:
       
       - name: Set frontend environment variables
         run: |
-          echo "VITE_BACKEND_URL=${{ needs.build-backend.outputs.BACKEND_URL }}" >> $GITHUB_ENV
-          echo "WEBSITE_HOSTNAME=${{ needs.build-backend.outputs.WEBSITE_HOSTNAME }}" >> $GITHUB_ENV
+          export "VITE_BACKEND_URL=${{ needs.build-backend.outputs.BACKEND_URL }}"
+          export "WEBSITE_HOSTNAME=${{ needs.build-backend.outputs.WEBSITE_HOSTNAME }}"
 
       - name: Build frontend
         run: |
@@ -409,4 +409,4 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Backend URL: ${{ steps.deploy-backend.outputs.webapp-url }}"
-          echo "Frontend URL: ${{ steps.get_url.outputs.STATIC_WEBSITE_URL }}"
+          echo "Frontend URL: ${{ steps.get_frontend_url.outputs.STATIC_WEBSITE_URL }}"
