@@ -260,6 +260,43 @@ jobs:
           echo "AZURE_STORAGE_ACCOUNT_NAME=${STORAGE_ACCOUNT}" >> $GITHUB_ENV
           echo "AZURE_STORAGE_ACCOUNT_KEY=${STORAGE_KEY}" >> $GITHUB_ENV
 
+      - name: Assign required permissions
+        run: |
+          # Get the resource IDs
+          STORAGE_ID=$(az storage account show --name ${{ needs.build-backend.outputs.AZURE_STORAGE_ACCOUNT_NAME }} --resource-group hoster --query id -o tsv)
+          WEBAPP_ID=$(az webapp show --name hoster --resource-group hoster --query id -o tsv)
+          
+          # Storage permissions
+          az role assignment create \
+            --assignee ${{ secrets.AZURE_CLIENT_ID }} \
+            --role "Storage Blob Data Contributor" \
+            --scope "$STORAGE_ID"
+            
+          az role assignment create \
+            --assignee ${{ secrets.AZURE_CLIENT_ID }} \
+            --role "Storage Account Contributor" \
+            --scope "$STORAGE_ID"
+          
+          # Web App permissions
+          az role assignment create \
+            --assignee ${{ secrets.AZURE_CLIENT_ID }} \
+            --role "Website Contributor" \
+            --scope "$WEBAPP_ID"
+          
+          # Key Vault permissions (if using Key Vault)
+          az role assignment create \
+            --assignee ${{ secrets.AZURE_CLIENT_ID }} \
+            --role "Key Vault Secrets User" \
+            --resource-group hoster
+
+          # Resource Group level backup permissions (for management operations)
+          az role assignment create \
+            --assignee ${{ secrets.AZURE_CLIENT_ID }} \
+            --role "Contributor" \
+            --resource-group hoster
+
+          echo "All permissions assigned or verified"
+
       - name: Download backend artifact
         uses: actions/download-artifact@v4
         with:
@@ -304,6 +341,26 @@ jobs:
             --404-document error.html \
             --index-document index.html
             
+      - name: Configure CORS for storage account
+        run: |
+          az storage cors add \
+            --account-name ${AZURE_STORAGE_ACCOUNT_NAME} \
+            --services b \
+            --methods GET HEAD OPTIONS \
+            --origins "https://hoster.azurewebsites.net" \
+            --allowed-headers "Authorization,Content-Type,Accept,Origin" \
+            --exposed-headers "*" \
+            --max-age 200
+
+      - name: Configure App Service CORS
+        run: |
+          az webapp cors add \
+            --resource-group hoster \
+            --name hoster \
+            --allowed-origins "https://${AZURE_STORAGE_ACCOUNT_NAME}.z*.web.core.windows.net" \
+            --allowed-methods "GET POST PUT DELETE OPTIONS" \
+            --allowed-headers "Authorization,Content-Type,Accept"
+
       # Deploy frontend
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
@@ -334,15 +391,7 @@ jobs:
             --output tsv)
           echo "STATIC_WEBSITE_URL=${STATIC_WEBSITE_URL}" >> $GITHUB_OUTPUT
 
-      - name: Configure CORS for storage account
-        run: |
-          az storage cors add \
-            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
-            --origins "*" \
-            --methods GET HEAD OPTIONS \
-            --allowed-headers "*" \
-            --exposed-headers "*" \
-            --services b
+    
 
       - name: Create CDN profile and endpoint
         run: |
